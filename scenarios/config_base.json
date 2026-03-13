@@ -1,0 +1,43 @@
+{
+  "_description": "Realistic parameters derived from BUPT-1 (Tiansuan Constellation) hardware measurements.",
+  "_note": "Fields prefixed with '_' are metadata only — the solver ignores them. Rollback by pointing to config_base_old.json.",
+
+  "_units": {
+    "alpha":       "dimensionless — cost weight for processor nodes",
+    "beta":        "dimensionless — cost weight for communication nodes",
+    "R_max":       "bytes/s — max ISL/downlink link rate (X-band, 20 Mbps)",
+    "T_comm":      "seconds — communication window duration per pass",
+    "T_comp":      "seconds — total computation window (one orbit segment)",
+    "delta_t":     "seconds — scheduling time slot",
+    "N":           "dimensionless — max total nodes (upper bound for solver)",
+    "E_processor": "Wh (watt-hours) — energy budget per processor node for the full T_comp window",
+    "E_comm":      "Wh (watt-hours) — energy budget per communication node for the full T_comm window",
+    "p":           "Wh/FLOP — energy cost per floating-point op (FP16, Tensor Cores)",
+    "q":           "Wh/byte — energy cost per transmitted byte (X-band link)"
+  },
+
+  "_derivations": {
+    "R_max":       "X-band target rate: 20 Mbps = 20e6 bits/s / 8 = 2,500,000 bytes/s. Expressed in bytes/s to match D (bytes) in layer JSON files, keeping the bandwidth constraint I*D <= (x+y)*R_max*T_comm dimensionally consistent.",
+    "E_processor": "10% of per-orbit usable battery energy allocated to processing satellite: 0.10 * 0.25 * 115 Wh = 2.875 Wh, rounded to 2.9 Wh. Represents the fraction of battery depth-of-discharge (25% DoD target on 115 Wh battery) that one processing satellite can spend on inference per orbit.",
+    "E_comm":      "10% of per-orbit usable battery energy allocated to communication satellite: 0.10 * 0.25 * 115 Wh = 2.875 Wh, rounded to 2.9 Wh. Same DoD-based budget as E_processor but for inter-satellite link / downlink transmission.",
+    "p":           "FP16 Tensor Cores: 15 W / 10 TFLOPS = 1.5e-12 J/FLOP. Converted to Wh: 1.5e-12 / 3600 = 4.17e-16 Wh/FLOP.",
+    "q":           "X-band: 38 W at 100 Mbps = 12.5 MB/s => 38 / 12.5e6 = 3.04e-6 J/byte. Converted to Wh: 3.04e-6 / 3600 = 8.44e-10 Wh/byte."
+  },
+
+
+  "alpha":       4.0,
+  "beta":        1.0,
+  "T_comp":      5100.0,
+  "T_comm":      300.0,
+  "T_idle":      900.0,
+  "E_processor": 1.5,
+  "E_comm":      5.0,
+  "R_max":       625000.0,
+  "p":           1.63e-13,
+  "q":           9.89e-8,
+  "delta_t":     10.0,
+  "N":           50000
+
+}
+
+
