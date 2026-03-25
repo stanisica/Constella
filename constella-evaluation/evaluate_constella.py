@@ -15,9 +15,9 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-from evaluate_baselines import load_config, load_layers, solve_ocri
-import simulate_v2 as _sim_module
-from simulate_v2 import simulate_v2
+from utils import load_config, load_layers, solve_ocri
+import simulate as _sim_module
+from simulate import simulate
 
 RAW_IMAGE_D = 3 * 224 * 224 * 4  # 3×224×224×float32 in bytes (matching layer D units)
 
@@ -81,18 +81,18 @@ def run_approach(approach, layers, I_total, X_total, Y_total, cfg):
         ocri_time = time.perf_counter() - t0
         W, D = layers[l - 1]
         reset_lia_timer()
-        metrics = simulate_v2(X, Y, l, W, D, I_total, cfg, "LIA")
+        metrics = simulate(X, Y, l, W, D, I_total, cfg, "LIA")
         lia_avg_time = get_lia_avg_time()
 
     elif approach == "Naive":
         X, Y, l = heuristic_config(layers, X_total, Y_total)
         W, D = layers[l - 1]
-        metrics = simulate_v2(X, Y, l, W, D, I_total, cfg, "Static")
+        metrics = simulate(X, Y, l, W, D, I_total, cfg, "Static")
 
     elif approach == "Traditional":
         X, Y, l = X_total, 0, 0
         W, D = 0, RAW_IMAGE_D
-        metrics = simulate_v2(X, Y, l, W, D, I_total, cfg, "DirectOnly")
+        metrics = simulate(X, Y, l, W, D, I_total, cfg, "DirectOnly")
 
     return X, Y, l, W, D, metrics, ocri_time, lia_avg_time
 

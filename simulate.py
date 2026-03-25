@@ -1,19 +1,9 @@
-"""Simulation engine with five routing strategies.
-
-Strategies:
-  DirectOnly  – Decoupled (X,Y), processors downlink locally (no ISL).
-  Homogeneous – N identical processor nodes, local downlink.
-  Static      – Decoupled (X,Y), fixed round-robin map (processor i -> comm i%Y).
-  GreedyEVF   – Decoupled (X,Y), earliest visible comm window (no load awareness).
-  LIA         – Decoupled (X,Y), eligibility checks + closest-to-window selection.
-
-Reuses orbital utilities from simulate_lia.
-"""
+"""Simulation engine with five routing strategies."""
 
 import math
 import random
 
-from simulate_lia import SimMetrics, build_satellites, next_comm_entry
+from orbital_model import SimMetrics, build_satellites, next_comm_entry
 
 
 # ---------------------------------------------------------------------------
@@ -68,7 +58,7 @@ def _decide_lia(comm_states, t, proc_offset, D, R_max, q, e_p,
 # Main simulation loop
 # ---------------------------------------------------------------------------
 
-def simulate_v2(X, Y, l_star, W, D, I_total, cfg, strategy,
+def simulate(X, Y, l_star, W, D, I_total, cfg, strategy,
                 seed=42, energy_trace=None):
     random.seed(seed)
     T_comp = cfg["T_comp"]

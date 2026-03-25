@@ -73,40 +73,33 @@ def lia_decide(communicators, t, proc_offset, D, R_max, q, e_p,
     """
     eligible = []
     for c_id, buf_bytes, c_energy, c_offset in communicators:
-        # Skip communicators currently in their comm window (unavailable)
         orbit_clock_c = (t + c_offset) % T_orbit
         if orbit_clock_c >= T_comp + T_idle:
             if log is not None:
                 log.append(f"    C{c_id}: SKIP (in comm window, clock={orbit_clock_c:.1f})")
             continue
 
-        # Capacity check: can the comm window handle buffered + new data?
         if buf_bytes + D > T_comm * R_max:
             if log is not None:
                 log.append(f"    C{c_id}: SKIP (capacity: buf+D={buf_bytes+D} > {T_comm*R_max:.0f})")
             continue
 
-        # Energy check: can communicator transmit all buffered + new data?
         energy_needed = (buf_bytes + D) * q
         if c_energy < energy_needed:
             if log is not None:
                 log.append(f"    C{c_id}: SKIP (energy: need={energy_needed:.4f}, have={c_energy:.4f})")
             continue
 
-        # Time until comm window start
         t_comm_start = next_comm_entry(t, c_offset, T_comp, T_idle, T_orbit)
         wait_time = t_comm_start - t
         eligible.append((c_id, wait_time))
 
     if eligible:
-        # Pick the communicator closest to its comm window
         eligible.sort(key=lambda x: x[1])
         if log is not None:
             log.append(f"    Eligible: {[(cid, f'{w:.0f}s') for cid, w in eligible]}")
         return "forward", eligible[0][0]
 
-    # No eligible communicator — try direct
-    # Processor must reserve energy for transmitting its buffered data
     if e_p >= D * q:
         return "direct", None
     else:
@@ -196,7 +189,6 @@ def simulate(X, Y, l_star, W, D, I_total, cfg, strategy, seed=42, log=None, ener
                         log.append(f"  t={t:.0f} P{p['id']}: MISSED (no energy for tx, need={tx_energy:.6f}, have={p['energy']:.6f})")
                 continue
 
-            # Build communicator states with previous step's buffer sizes and energy
             comm_states = []
             for c in communicators:
                 comm_states.append((c["id"], prev_comm_bufs[c["id"]],
@@ -218,7 +210,7 @@ def simulate(X, Y, l_star, W, D, I_total, cfg, strategy, seed=42, log=None, ener
 
             if action == "direct":
                 tx_energy = D * q
-                p["energy"] -= tx_energy  # Reserve energy for transmission
+                p["energy"] -= tx_energy  
                 p["buffer"].append((D, t, p["id"]))
                 if log is not None:
                     t_entry_p = next_comm_entry(t, p["offset"], T_comp, T_idle, T_orbit)
@@ -238,12 +230,10 @@ def simulate(X, Y, l_star, W, D, I_total, cfg, strategy, seed=42, log=None, ener
         log.append("")
         log.append("--- PHASE 2: COMMUNICATION ---")
 
-    # Phase 2: drain buffers to ground
     for s in sats:
         if not s["buffer"]:
             continue
 
-        # Find this satellite's comm entry time after the earliest possible capture
         t_entry_base = (T_comp + T_idle - s["offset"]) % T_orbit
 
         if log is not None:
@@ -286,8 +276,6 @@ def simulate(X, Y, l_star, W, D, I_total, cfg, strategy, seed=42, log=None, ener
         log.append("")
         log.append(f"--- SUMMARY: delivered={len(delivered)}, missed={missed}, total={len(delivered)+missed} ---")
 
-    # Compute metrics
-    # Missed images are penalized with T_orbit latency (must wait for next orbit)
     latencies = sorted(
         [arrival - capture for capture, arrival, _ in delivered]
         + [T_orbit] * missed

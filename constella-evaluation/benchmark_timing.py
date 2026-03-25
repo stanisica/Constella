@@ -19,9 +19,9 @@ import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-from evaluate_baselines import load_config, load_layers, solve_ocri
-import simulate_v2 as _sim_module
-from simulate_v2 import simulate_v2
+from utils import load_config, load_layers, solve_ocri
+import simulate as _sim_module
+from simulate import simulate
 
 # ---------------------------------------------------------------------------
 # Instrument _decide_lia to measure per-call wall-clock time
@@ -105,7 +105,7 @@ def benchmark(iterations):
 
             # LIA timing: use total accumulated _decide_lia time (0 if Y=0)
             reset_lia_timer()
-            simulate_v2(X, Y, l, W, D, I_total, cfg, "LIA", seed=42 + i)
+            simulate(X, Y, l, W, D, I_total, cfg, "LIA", seed=42 + i)
             lia_elapsed = _lia_total_time
             lia_avg_decision = get_lia_avg_time()
 
