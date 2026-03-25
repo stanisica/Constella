@@ -1,10 +1,4 @@
-"""Constella unified evaluation framework.
-
-Compares three approaches:
-  Constella    – OCRI (offline) + LIA (online)
-  Naive        – heuristic config (offline) + round-robin (online)
-  Traditional  – no split inference, raw downlink only
-"""
+"""Constella evaluation: compares Constella, Naive Baseline, and Traditional Baseline."""
 
 import csv
 import json

@@ -3,8 +3,6 @@
 Runs evaluate_constella's Constella approach N times per scenario,
 computes average OCRI and LIA simulation times, and plots them.
 
-Usage:
-    python benchmark_timing.py [--iterations N]
 """
 
 import argparse
@@ -164,11 +162,7 @@ def benchmark(iterations):
     plt.close(fig)
     print(f"Saved plot to {plot_path}")
 
-    # --- Plot 2: per-decision times (log scale) ---
-    # Convert per-decision LIA avg from seconds to ms
     lia_decision_ms = [t * 1000 for t in lia_decision_avgs]
-    # OCRI is one decision per run, so its per-decision time = ocri_avgs (already ms)
-    # Constella per-decision = OCRI + single LIA decision
     constella_decision_ms = [o + l for o, l in zip(ocri_avgs, lia_decision_ms)]
 
     fig2, ax2 = plt.subplots(figsize=(6, 2.4))
