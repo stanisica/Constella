@@ -118,30 +118,6 @@ def plot_latency():
     save(fig, "plot_latency.pdf")
 
 
-def plot_execution_time():
-    """Line plot: x=scenario, y=total Constella execution time (OCRI + avg LIA decision)."""
-    rows = load_csv()
-    constella_rows = sorted(
-        [r for r in rows if r["approach"] == "Constella"],
-        key=lambda r: LABEL_ORDER.index(r["label"]),
-    )
-
-    labels = [LABEL_SHORT[r["label"]] for r in constella_rows]
-    ocri_times = [float(r["ocri_time"]) for r in constella_rows]
-    lia_avg_times = [float(r["lia_avg_time"]) for r in constella_rows]
-    total_times = [o + l for o, l in zip(ocri_times, lia_avg_times)]
-
-    fig, ax = plt.subplots(figsize=(6, 2.5))
-    ax.plot(labels, total_times, marker="o", linewidth=1.5,
-            linestyle="--", color="C0", label="OCRI + avg LIA decision")
-
-    ax.set_xlabel("Scenario")
-    ax.set_ylabel("Time (s)")
-    ax.set_yscale("log")
-    fig.tight_layout()
-    save(fig, "plot_execution_time.pdf")
-
-
 def plot_energy():
     """Grouped bar chart: x=scenario, y=total energy (Wh), log scale."""
     rows = load_csv()
@@ -178,5 +154,4 @@ def plot_energy():
 if __name__ == "__main__":
     plot_cost_success_tradeoff()
     plot_latency()
-    plot_execution_time()
     plot_energy()
