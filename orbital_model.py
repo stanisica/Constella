@@ -27,7 +27,6 @@ def build_satellites(X, Y, cfg):
 
     majority_role = "processor" if X >= Y else "communicator"
     minority_role = "communicator" if X >= Y else "processor"
-    n_majority = max(X, Y)
     n_minority = min(X, Y)
 
     roles = [majority_role] * N_active

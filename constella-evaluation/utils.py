@@ -1,9 +1,8 @@
 import json
-import math
 import os
 import sys
 
-from mip import Model, minimize, INTEGER, BINARY, xsum
+from mip_solver import solve_ocri
 
 
 def load_config(base_dir):
@@ -16,35 +15,6 @@ def load_layers(base_dir, model_name):
     path = os.path.join(base_dir, "model-layers", f"{model_name}.json")
     with open(path) as f:
         return [(W, D) for W, D in json.load(f)]
-
-
-def solve_ocri(layers, I_total, X_total, Y_total, cfg):
-    I_max = int(math.floor(cfg["T_comp"] / cfg["delta_t"]))
-    m = Model()
-    m.verbose = 0
-
-    x = m.add_var(var_type=INTEGER, lb=1, name="x")
-    y = m.add_var(var_type=INTEGER, lb=0, name="y")
-    z = {l: m.add_var(var_type=BINARY, name=f"z_{l}") for l in range(1, len(layers) + 1)}
-    m.add_constr(xsum(z[l] for l in range(1, len(layers) + 1)) == 1)
-
-    W_sel = xsum(layers[l-1][0] * z[l] for l in range(1, len(layers) + 1))
-    D_sel = xsum(layers[l-1][1] * z[l] for l in range(1, len(layers) + 1))
-
-    m.add_constr(I_total * D_sel <= (x + y) * cfg["R_max"] * cfg["T_comm"])
-    m.add_constr(I_total * W_sel * cfg["p"] <= x * cfg["E_processor"])
-    m.add_constr(I_total * (W_sel * cfg["p"] + D_sel * cfg["q"]) <= x * cfg["E_processor"] + y * cfg["E_comm"])
-    m.add_constr(I_total <= x * I_max)
-    m.add_constr(x >= 1)
-    m.add_constr(y >= 0)
-    m.add_constr(x <= X_total)
-    m.add_constr(y <= Y_total)
-
-    m.objective = minimize(cfg["alpha"] * x + cfg["beta"] * y)
-    m.optimize()
-
-    l_opt = [l for l in range(1, len(layers) + 1) if z[l].x >= 0.99][0]
-    return int(round(x.x)), int(round(y.x)), l_opt
 
 
 def generate_model_layers(model_name):

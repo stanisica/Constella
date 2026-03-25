@@ -9,8 +9,6 @@ import matplotlib.lines as mlines
 
 RESULTS_DIR = "results"
 LABEL_ORDER = ["extra-small", "small", "medium", "large", "extra-large"]
-LABEL_SHORT = {"extra-small": "extra-small", "small": "small", "medium": "medium",
-               "large": "large", "extra-large": "extra-large"}
 
 APPROACHES = ["Constella", "Naive", "Traditional"]
 DISPLAY_NAMES = {"Constella": "Constella", "Naive": "NB", "Traditional": "TB"}
@@ -102,7 +100,7 @@ def plot_latency():
             [r for r in rows if r["approach"] == approach],
             key=lambda r: LABEL_ORDER.index(r["label"]),
         )
-        labels = [LABEL_SHORT[r["label"]] for r in subset]
+        labels = [r["label"] for r in subset]
         latencies = [float(r["mean_latency"]) for r in subset]
         ax.plot(labels, latencies,
                 marker=APPROACH_MARKERS[approach], linewidth=1.5,
@@ -142,7 +140,7 @@ def plot_energy():
 
     ax.set_yscale("log")
     ax.set_xticks(x)
-    ax.set_xticklabels([LABEL_SHORT[l] for l in LABEL_ORDER], fontsize=9)
+    ax.set_xticklabels(LABEL_ORDER, fontsize=9)
     ax.set_xlabel("Scenario", fontsize=9)
     ax.set_ylabel("Energy (Wh)", fontsize=9)
     ax.tick_params(axis='y', labelsize=9)

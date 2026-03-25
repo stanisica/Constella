@@ -1,4 +1,4 @@
-"""Simulation engine with five routing strategies."""
+"""Simulation engine with three routing strategies (DirectOnly, Static, LIA)."""
 
 import math
 import random
@@ -13,22 +13,6 @@ from orbital_model import SimMetrics, build_satellites, next_comm_entry
 def _decide_static(proc_idx, comm_ids):
     """Fixed round-robin: processor index i -> communicator i % Y."""
     return "forward", comm_ids[proc_idx % len(comm_ids)]
-
-
-def _decide_greedy_evf(comm_states, t, T_comp, T_idle, T_orbit):
-    """Pick communicator with earliest comm window, ignoring load / energy."""
-    best_id, best_wait = None, float("inf")
-    for c_id, _, _, c_offset in comm_states:
-        orbit_clock = (t + c_offset) % T_orbit
-        if orbit_clock >= T_comp + T_idle:
-            continue
-        wait = next_comm_entry(t, c_offset, T_comp, T_idle, T_orbit) - t
-        if wait < best_wait:
-            best_wait = wait
-            best_id = c_id
-    if best_id is not None:
-        return "forward", best_id
-    return "direct", None
 
 
 def _decide_lia(comm_states, t, proc_offset, D, R_max, q, e_p,
@@ -120,7 +104,7 @@ def simulate(X, Y, l_star, W, D, I_total, cfg, strategy,
             tasks_generated += 1
 
             # --- Routing decision ---
-            if strategy in ("DirectOnly", "Homogeneous") or Y == 0:
+            if strategy == "DirectOnly" or Y == 0:
                 action, target_id = "direct", None
             else:
                 comm_states = [
@@ -131,9 +115,6 @@ def simulate(X, Y, l_star, W, D, I_total, cfg, strategy,
                 if strategy == "Static":
                     action, target_id = _decide_static(
                         proc_index[p["id"]], comm_ids)
-                elif strategy == "GreedyEVF":
-                    action, target_id = _decide_greedy_evf(
-                        comm_states, t, T_comp, T_idle, T_orbit)
                 elif strategy == "LIA":
                     action, target_id = _decide_lia(
                         comm_states, t, p["offset"], D, R_max, q, p["energy"],
