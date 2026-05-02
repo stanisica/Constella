@@ -4,10 +4,22 @@ import csv
 import os
 
 import numpy as np
+
+BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+CACHE_DIR = os.path.join(os.environ.get("TMPDIR", "/tmp"), "constella-artifact-cache")
+os.makedirs(CACHE_DIR, exist_ok=True)
+os.makedirs(os.path.join(CACHE_DIR, "matplotlib"), exist_ok=True)
+os.makedirs(os.path.join(CACHE_DIR, "fontconfig"), exist_ok=True)
+os.environ.setdefault("MPLCONFIGDIR", os.path.join(CACHE_DIR, "matplotlib"))
+os.environ.setdefault("XDG_CACHE_HOME", CACHE_DIR)
+
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 
-RESULTS_DIR = "results"
+RESULTS_DIR = os.environ.get(
+    "CONSTELLA_RESULTS_DIR",
+    os.path.join(BASE_DIR, "artifact-output", "paper-results"),
+)
 LABEL_ORDER = ["extra-small", "small", "medium", "large", "extra-large"]
 
 APPROACHES = ["Constella", "Naive", "Traditional"]

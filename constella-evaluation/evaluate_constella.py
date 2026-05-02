@@ -8,7 +8,7 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-from utils import load_config, load_layers, solve_ocri
+from utils import get_results_dir, load_config, load_layers, solve_ocri
 import simulate as _sim_module
 from simulate import simulate
 
@@ -92,7 +92,7 @@ def run_approach(approach, layers, I_total, X_total, Y_total, cfg):
 
 def evaluate():
     base_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
+    out_dir = get_results_dir(base_dir)
     os.makedirs(out_dir, exist_ok=True)
 
     cfg = load_config(base_dir)

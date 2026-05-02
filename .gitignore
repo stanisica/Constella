@@ -194,6 +194,15 @@ cython_debug/
 # Ruff stuff:
 .ruff_cache/
 
+# Constella artifact reproduction outputs
+.artifact-cache/
+artifact-output/
+constella-evaluation/results/
+
+# Local paper drafts and agent/editor state
+/Constella.pdf
+.claude/
+
 # PyPI configuration file
 .pypirc
 

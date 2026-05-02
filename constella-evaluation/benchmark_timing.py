@@ -6,17 +6,26 @@ computes average OCRI and LIA simulation times, and plots them.
 """
 
 import argparse
+import csv
 import json
 import os
 import sys
 import time
 import statistics
 
+BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+CACHE_DIR = os.path.join(os.environ.get("TMPDIR", "/tmp"), "constella-artifact-cache")
+os.makedirs(CACHE_DIR, exist_ok=True)
+os.makedirs(os.path.join(CACHE_DIR, "matplotlib"), exist_ok=True)
+os.makedirs(os.path.join(CACHE_DIR, "fontconfig"), exist_ok=True)
+os.environ.setdefault("MPLCONFIGDIR", os.path.join(CACHE_DIR, "matplotlib"))
+os.environ.setdefault("XDG_CACHE_HOME", CACHE_DIR)
+
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-from utils import load_config, load_layers, solve_ocri
+from utils import get_results_dir, load_config, load_layers, solve_ocri
 import simulate as _sim_module
 from simulate import simulate
 
@@ -57,7 +66,7 @@ def get_lia_avg_time():
 # ---------------------------------------------------------------------------
 
 def benchmark(iterations):
-    base_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    base_dir = BASE_DIR
     cfg = load_config(base_dir)
 
     scenario_path = os.path.join(base_dir, "scenarios", "scenario_constella.json")
@@ -74,6 +83,8 @@ def benchmark(iterations):
     ocri_avgs = []
     lia_avgs = []
     lia_decision_avgs = []
+    summary_rows = []
+    raw_rows = []
 
     for config in scenario["configs"]:
         label = config["label"]
@@ -109,6 +120,14 @@ def benchmark(iterations):
             ocri_times.append(ocri_elapsed)
             lia_times.append(lia_elapsed)
             lia_per_decision.append(lia_avg_decision)
+            raw_rows.append({
+                "label": label,
+                "model": model_name,
+                "iteration": i + 1,
+                "ocri_ms": ocri_elapsed * 1000,
+                "lia_total_ms": lia_elapsed * 1000,
+                "lia_per_decision_us": lia_avg_decision * 1e6,
+            })
 
             print(f"  [{i+1:>{len(str(iterations))}}/{iterations}] "
                   f"OCRI: {ocri_elapsed*1000:8.2f} ms   "
@@ -126,14 +145,37 @@ def benchmark(iterations):
         ocri_avgs.append(ocri_mean * 1000)  # convert to ms
         lia_avgs.append(lia_mean * 1000)    # convert to ms
         lia_decision_avgs.append(lia_dec_mean)
+        summary_rows.append({
+            "label": label,
+            "model": model_name,
+            "iterations": iterations,
+            "ocri_mean_ms": ocri_mean * 1000,
+            "ocri_std_ms": ocri_std * 1000,
+            "lia_total_mean_ms": lia_mean * 1000,
+            "lia_total_std_ms": lia_std * 1000,
+            "lia_per_decision_mean_us": lia_dec_mean * 1e6,
+            "lia_per_decision_std_us": lia_dec_std * 1e6,
+        })
 
         print(f"  => OCRI avg: {ocri_mean*1000:.2f} ms (std: {ocri_std*1000:.2f} ms)")
         print(f"  => LIA  avg: {lia_mean*1000:.2f} ms (std: {lia_std*1000:.2f} ms)")
         print(f"  => LIA  avg/decision: {lia_dec_mean*1e6:.2f} µs (std: {lia_dec_std*1e6:.2f} µs)\n")
 
     # --- Plot 1: total times (linear scale) ---
-    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
+    out_dir = get_results_dir(base_dir)
     os.makedirs(out_dir, exist_ok=True)
+    summary_path = os.path.join(out_dir, "benchmark_timing_summary.csv")
+    raw_path = os.path.join(out_dir, "benchmark_timing_raw.csv")
+
+    with open(summary_path, "w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(summary_rows[0].keys()))
+        writer.writeheader()
+        writer.writerows(summary_rows)
+
+    with open(raw_path, "w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(raw_rows[0].keys()))
+        writer.writeheader()
+        writer.writerows(raw_rows)
 
     fig, ax = plt.subplots(figsize=(6, 2.4))
     x = range(len(labels))
@@ -187,6 +229,8 @@ def benchmark(iterations):
     fig2.savefig(plot_path2, format="pdf", bbox_inches="tight", pad_inches=0)
     plt.close(fig2)
     print(f"Saved plot to {plot_path2}")
+    print(f"Saved summary to {summary_path}")
+    print(f"Saved raw timings to {raw_path}")
 
 
 def main():
