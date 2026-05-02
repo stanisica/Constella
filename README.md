@@ -1,12 +1,12 @@
-# Constella Artifact
+# Constella
 
-This repository is the Euro-Par 2026 artifact for the paper "Constella: A Novel
+This repository is the artifact for the paper "Constella: A Novel
 Framework for Cost-Efficient Distributed AI Inference in LEO Space Data
 Centers". It reproduces the selected empirical results from the paper: Table 1,
 Figures 2-5, and the headline claims on success rate, deployment cost, latency,
 energy consumption, and OCRI/LIA execution overhead.
 
-This README is intended to serve as the Artifact Evaluation Overview Document
+This README is intended to serve as the artifact evaluation overview document
 and can be exported to PDF for submission.
 
 ## Overview
@@ -15,14 +15,12 @@ Constella combines OCRI, an offline mixed-integer resource identifier, with LIA,
 an online latency-aware ISL assignment algorithm. The artifact is self-contained
 source code and runs as user-level software on a standard Linux environment. It
 does not require root access, administrator privileges, GPUs, HPC resources,
-proprietary software, external datasets, pretrained model weights, or the
-authors' private `dnn-analysis` repository.
+proprietary software, external datasets, or pretrained model weights.
 
 The paper states that constellation parameters are derived from the BUPT-1
 dataset and that hardware efficiency follows NVIDIA Jetson Orin Nano
-measurements. For artifact evaluation, the derived constants are already encoded
-in `scenarios/config_base.json`; reviewers do not need to download the raw
-BUPT-1 dataset. DNN layer profiles are regenerated locally from torchvision
+measurements. For the efficiency of artifact evaluation, the derived constants are encoded
+in `scenarios/config_base.json`, thus there is no need for downloading the raw dataset. DNN layer profiles are regenerated locally from torchvision
 architectures with `weights=None`.
 
 ## Getting Started Guide
@@ -153,15 +151,14 @@ Additional checks tied directly to the paper text:
 Timing results are wall-clock measurements and should not be compared by exact
 equality. The paper reports OCRI runtimes of `3.93-23.35 ms`, cumulative LIA
 time of `0.04-4.19 ms` per orbit, and combined Constella overhead under `28 ms`.
-Reviewer machines may produce slightly different values; the expected behavior
-is that both OCRI and LIA remain low-overhead and that LIA is zero when `Y = 0`.
+While different machines may produce slightly different values, the overal expected behavior
+is that both OCRI and LIA remain low-overhead compared to baselines.
 
 ## Execution Time and Resources
 
-The full reproduction process is designed to complete well below the Euro-Par
-AEP 8-hour limit. The setup and installation steps should complete within one
+The full reproduction process and installation steps should complete within one
 hour on a recent workstation or cluster compute node with network access for
-Python packages.
+Python packages. It is noteworthy that no container, VM, root privileges, or GPU access is required.
 
 Reference validation platform:
 
@@ -169,20 +166,13 @@ Reference validation platform:
 - Python environment: conda `py312`
 - Python: 3.12.2
 - Hardware: standard CPU-only workstation
-- Special hardware: none
-- Observed full reproduction time: under one minute
-
-No container, VM, root privileges, GPU, or HPC access is required.
+- Observed full reproduction time: < 1min
 
 ## Artifact Size and Packaging
 
 The artifact is self-contained. No additional datasets are downloaded during
 execution. At the time of this check, the repository is approximately 2.1 MB and
-the generated `artifact-output/` directory is approximately 156 KB, both well
-below the Euro-Par AEP limits of 1 GB for the main artifact and 5 GB for
-separate uncompressed datasets.
-
-The submission archive should include source code, scripts, `requirements.txt`,
+the generated `artifact-output/` directory is approximately 156 KB. The submission archive should include source code, scripts, `requirements.txt`,
 scenario files, model-layer reference files, and this README. Exclude local
 environments and caches such as `.venv/`, conda environments, `__pycache__/`,
 `.artifact-cache/`, and package-manager caches.
@@ -202,10 +192,3 @@ environments and caches such as `.venv/`, conda environments, `__pycache__/`,
 - `scenarios/*.json`: paper scenarios and simulation parameters.
 - `model-layers/*.json`: checked-in reference model-layer profiles.
 
-## Submission Notes
-
-During the Euro-Par technical clarification window, authors should monitor the
-submission email address and respond promptly to Artifact Evaluation Chair
-requests. After acceptance, upload the final artifact to the official Euro-Par
-2026 Zenodo community, generate a new Zenodo DOI, and cite that DOI in the
-camera-ready paper's Artifact Availability statement and reference list.
