@@ -106,16 +106,18 @@ paper.
 
 ## Output Mapping
 
-| Paper item | Command | Generated output | Validation criterion |
-| --- | --- | --- | --- |
-| Table 1: scenarios and constellation parameters | `./reproduce_paper_artifacts.sh` | `artifact-output/paper-results/table1_scenarios_and_parameters.csv` | Scenario sizes, model names, `|L|`, and shared parameters match Table 1. |
-| Figure 2: deployment cost vs. success rate | `./reproduce_paper_artifacts.sh` | `artifact-output/paper-results/plot_cost_success_tradeoff.pdf` and `constella_results.csv` | Constella reaches minimum success `0.8192` and one to two orders of magnitude lower cost. |
-| Figure 3: mean inference latency | `./reproduce_paper_artifacts.sh` | `artifact-output/paper-results/plot_latency.pdf` and `constella_results.csv` | Maximum mean-latency reduction is about `2.7x`. |
-| Figure 4: energy consumption per orbit | `./reproduce_paper_artifacts.sh` | `artifact-output/paper-results/plot_energy.pdf` and `constella_results.csv` | Maximum energy reduction is about `74x`; medium is the documented exception where TB uses less energy. |
-| Figure 5: mean execution time per orbit | `./reproduce_paper_artifacts.sh` | `artifact-output/paper-results/benchmark_timing.pdf`, `benchmark_timing_summary.csv`, and `benchmark_timing_raw.csv` | OCRI and LIA remain lightweight; exact wall-clock values may vary by machine. |
-| Supplemental timing detail | `./reproduce_paper_artifacts.sh` | `artifact-output/paper-results/benchmark_timing_per_decision.pdf` | Per-decision LIA overhead remains small; this plot is not a paper figure. |
-| Headline paper claims | `./reproduce_paper_artifacts.sh` | `artifact-output/paper-results/paper_claims_summary.csv` | Values match the expected claim table below. |
-| Provenance and manifest | `./reproduce_paper_artifacts.sh` | `artifact-output/paper-results/provenance.json` and `MANIFEST.md` | Files identify source scripts, models, and generated outputs. |
+All outputs in the table below are produced by running `./reproduce_paper_artifacts.sh`, so the command is the same for every row and is omitted to avoid repetition.
+
+| Paper item | Generated output | Validation criterion |
+| --- | --- | --- |
+| Table 1: scenarios and constellation parameters | `artifact-output/paper-results/table1_scenarios_and_parameters.csv` | Scenario sizes, model names, `|L|`, and shared parameters match Table 1. |
+| Figure 2: deployment cost vs. success rate | `artifact-output/paper-results/plot_cost_success_tradeoff.pdf` and `constella_results.csv` | Constella reaches minimum success `0.8192` and one to two orders of magnitude lower cost. |
+| Figure 3: mean inference latency | `artifact-output/paper-results/plot_latency.pdf` and `constella_results.csv` | Maximum mean-latency reduction is about `2.7x`. |
+| Figure 4: energy consumption per orbit | `artifact-output/paper-results/plot_energy.pdf` and `constella_results.csv` | Maximum energy reduction is about `74x`; medium is the documented exception where TB uses less energy. |
+| Figure 5: mean execution time per orbit | `artifact-output/paper-results/benchmark_timing.pdf`, `benchmark_timing_summary.csv`, and `benchmark_timing_raw.csv` | OCRI and LIA remain lightweight; exact wall-clock values may vary by machine. |
+| Supplemental timing detail | `artifact-output/paper-results/benchmark_timing_per_decision.pdf` | Per-decision LIA overhead remains small; this plot is not a paper figure. |
+| Headline paper claims | `artifact-output/paper-results/paper_claims_summary.csv` | Values match the expected claim table below. |
+| Provenance and manifest | `artifact-output/paper-results/provenance.json` and `MANIFEST.md` | Files identify source scripts, models, and generated outputs. |
 
 Artifact model identifiers use Python names (`squeezenet1_0`, `swin_b`,
 `efficientnet_b0`). The exported Table 1 CSV also includes the paper display
@@ -151,7 +153,7 @@ Additional checks tied directly to the paper text:
 Timing results are wall-clock measurements and should not be compared by exact
 equality. The paper reports OCRI runtimes of `3.93-23.35 ms`, cumulative LIA
 time of `0.04-4.19 ms` per orbit, and combined Constella overhead under `28 ms`.
-While different machines may produce slightly different values, the overal expected behavior
+While different machines may produce slightly different values, the overall expected behavior
 is that both OCRI and LIA remain low-overhead compared to baselines.
 
 ## Execution Time and Resources
@@ -191,4 +193,3 @@ environments and caches such as `.venv/`, conda environments, `__pycache__/`,
 - `constella-evaluation/export_artifact_bundle.py`: reviewer bundle exporter.
 - `scenarios/*.json`: paper scenarios and simulation parameters.
 - `model-layers/*.json`: checked-in reference model-layer profiles.
-
