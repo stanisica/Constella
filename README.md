@@ -1,74 +1,100 @@
 # Constella
 
-This repository is the artifact for the paper "Constella: A Novel
+This repository contains the artifact for the paper "Constella: A Novel
 Framework for Cost-Efficient Distributed AI Inference in LEO Space Data
 Centers". It reproduces the selected empirical results from the paper: Table 1,
 Figures 2-5, and the headline claims on success rate, deployment cost, latency,
 energy consumption, and OCRI/LIA execution overhead.
 
-This README is intended to serve as the artifact evaluation overview document
-and can be exported to PDF for submission.
+The artifact is self-contained source code. It runs as user-level software with
+Python 3.12 and does not require root access, GPUs, HPC resources, proprietary
+software, external datasets, or pretrained model weights.
 
-## Overview
+For the reviewer-facing overview source, see `OVERVIEW.md`.
 
-Constella combines OCRI, an offline mixed-integer resource identifier, with LIA,
-an online latency-aware ISL assignment algorithm. The artifact is self-contained
-source code and runs as user-level software on a standard Linux environment. It
-does not require root access, administrator privileges, GPUs, HPC resources,
-proprietary software, external datasets, or pretrained model weights.
+## What Is Reproduced
+
+The workflow regenerates DNN layer profiles, evaluates Constella against the
+Naive Baseline (NB) and Traditional Baseline (TB), benchmarks OCRI/LIA timing,
+renders the paper plots, exports a reviewer bundle, and validates the generated
+outputs against expected paper-result values.
 
 The paper states that constellation parameters are derived from the BUPT-1
 dataset and that hardware efficiency follows NVIDIA Jetson Orin Nano
-measurements. For the efficiency of artifact evaluation, the derived constants are encoded
-in `scenarios/config_base.json`, thus there is no need for downloading the raw dataset. DNN layer profiles are regenerated locally from torchvision
-architectures with `weights=None`.
+measurements. For artifact evaluation, the derived constants are encoded in
+`scenarios/config_base.json`; no raw dataset download is required. DNN layer
+profiles are regenerated locally from torchvision architectures with
+`weights=None`.
 
-## Getting Started Guide
+## Requirements
 
-Use Python 3.12 or a compatible Python 3 version. The artifact was validated in
-a conda environment with Python 3.12.2 and these package versions:
+Supported evaluation path:
 
-- `mip==1.17.2`
-- `numpy==2.4.2`
-- `matplotlib==3.10.8`
+- Ubuntu 22.04.5 LTS on `x86_64`
+- Python 3.12
+- User-level virtual environment created by `scripts/create_env.sh`
+
+Other Python versions may work, but they are not part of the supported artifact
+evaluation path.
+
+The pinned Python dependencies are listed in `requirements.txt`:
+
+- `mip==1.17.1`
+- `numpy==2.2.4`
+- `matplotlib==3.10.0`
 - `torch==2.5.1`
 - `torchvision==0.20.1`
 - `torchinfo==1.8.0`
 
-Create a user-level virtual environment from the repository root:
+## Setup
+
+From the repository root, create the repo-local environment:
 
 ```bash
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+./scripts/create_env.sh
 ```
 
-If using conda, create or activate a Python 3.12 environment and install the same
-requirements:
+This creates `.constella-venv`, upgrades `pip`, and installs the pinned
+dependencies from `requirements.txt`. If `.constella-venv` already exists, the
+script exits without modifying it. To rebuild from scratch:
 
 ```bash
-conda create -n constella-aep python=3.12
-conda activate constella-aep
-python -m pip install -r requirements.txt
+./scripts/remove_env.sh
+./scripts/create_env.sh
 ```
 
 Verify the environment:
 
 ```bash
-python -c "import mip, numpy, matplotlib, torch, torchvision, torchinfo; print('OK')"
-python constella-evaluation/generate_model_layers.py --models all --check
+./scripts/check_env.sh
 ```
 
-The layer-profile check should report the paper model layer counts: AlexNet 23,
-SqueezeNet 1.0 67, ResNet50 182, Swin-B 311, and EfficientNet-B0 329.
+The check imports the required Python packages and verifies that local
+torchvision/torchinfo layer profiling reproduces the checked-in model-layer
+profiles:
 
-## Step-by-Step Reproduction
+- AlexNet: 23 layers
+- SqueezeNet 1.0: 67 layers
+- ResNet50: 182 layers
+- Swin-B: 311 layers
+- EfficientNet-B0: 329 layers
 
-Run the full paper reproduction pipeline from the repository root:
+If Python 3.12 is available through a user-level tool such as micromamba,
+activate or expose that Python before running `scripts/create_env.sh`. The
+artifact itself does not depend on micromamba.
+
+## Reproduce Paper Artifacts
+
+Run the full paper reproduction pipeline:
 
 ```bash
 ./reproduce_paper_artifacts.sh
+```
+
+By default, outputs are written to:
+
+```text
+artifact-output/paper-results/
 ```
 
 An alternate output directory may be supplied:
@@ -81,115 +107,139 @@ The script performs the complete paper workflow:
 
 1. Regenerates model-layer profiles for AlexNet, SqueezeNet 1.0, ResNet50,
    Swin-B, and EfficientNet-B0 using torchinfo and input shape `(3, 224, 224)`.
-2. Runs the Constella, Naive Baseline (NB), and Traditional Baseline (TB)
-   evaluation.
+2. Runs the Constella, NB, and TB evaluation.
 3. Runs the 50-iteration OCRI/LIA timing benchmark.
 4. Regenerates the paper figures.
-5. Exports the reviewer bundle to `artifact-output/paper-results/`.
+5. Exports the reviewer bundle.
 
-For a shorter functional check, run only the main evaluation:
-
-```bash
-python constella-evaluation/evaluate_constella.py
-```
-
-For optional supplemental robustness checks beyond the paper figures:
+For a shorter functional check after `scripts/check_env.sh`, run only the main
+evaluation:
 
 ```bash
-./run_extended_evaluation.sh
+.constella-venv/bin/python constella-evaluation/evaluate_constella.py
 ```
 
-The extended evaluation keeps the five paper scenario sizes fixed and varies
-additional DNN architectures. Its output is written to
-`artifact-output/extended-evaluation/` and is not required to reproduce the
-paper.
+## Validate Results
+
+After reproduction, validate the generated bundle:
+
+```bash
+./scripts/validate_results.sh
+```
+
+For a custom output directory:
+
+```bash
+./scripts/validate_results.sh /tmp/constella-paper-results
+```
+
+The validator checks required files, CSV schemas, scenario and approach
+coverage, deterministic paper metrics with tight tolerances, Table 1 metadata,
+model-layer counts and JSON structure, and timing-output invariants. It does
+not compare wall-clock timing values for exact equality.
+
+Validation writes a JSON report to:
+
+```text
+artifact-output/paper-results/validation_report.json
+```
+
+A successful Linux validation run printed:
+
+```text
+Status: PASS
+Checks: 1117 passed, 0 failed, 1117 total
+```
 
 ## Output Mapping
 
-All outputs in the table below are produced by running `./reproduce_paper_artifacts.sh`, so the command is the same for every row and is omitted to avoid repetition.
+The paper-result files below are produced by `./reproduce_paper_artifacts.sh`.
+The validation report is produced afterward by `./scripts/validate_results.sh`.
 
 | Paper item | Generated output | Validation criterion |
 | --- | --- | --- |
-| Table 1: scenarios and constellation parameters | `artifact-output/paper-results/table1_scenarios_and_parameters.csv` | Scenario sizes, model names, `|L|`, and shared parameters match Table 1. |
-| Figure 2: deployment cost vs. success rate | `artifact-output/paper-results/plot_cost_success_tradeoff.pdf` and `constella_results.csv` | Constella reaches minimum success `0.8192` and one to two orders of magnitude lower cost. |
-| Figure 3: mean inference latency | `artifact-output/paper-results/plot_latency.pdf` and `constella_results.csv` | Maximum mean-latency reduction is about `2.7x`. |
-| Figure 4: energy consumption per orbit | `artifact-output/paper-results/plot_energy.pdf` and `constella_results.csv` | Maximum energy reduction is about `74x`; medium is the documented exception where TB uses less energy. |
-| Figure 5: mean execution time per orbit | `artifact-output/paper-results/benchmark_timing.pdf`, `benchmark_timing_summary.csv`, and `benchmark_timing_raw.csv` | OCRI and LIA remain lightweight; exact wall-clock values may vary by machine. |
-| Supplemental timing detail | `artifact-output/paper-results/benchmark_timing_per_decision.pdf` | Per-decision LIA overhead remains small; this plot is not a paper figure. |
-| Headline paper claims | `artifact-output/paper-results/paper_claims_summary.csv` | Values match the expected claim table below. |
-| Provenance and manifest | `artifact-output/paper-results/provenance.json` and `MANIFEST.md` | Files identify source scripts, models, and generated outputs. |
+| Table 1: scenarios and constellation parameters | `table1_scenarios_and_parameters.csv` | Scenario sizes, model names, layer counts, and shared parameters match the paper table. |
+| Figure 2: deployment cost vs. success rate | `plot_cost_success_tradeoff.pdf`, `constella_results.csv` | Constella reaches minimum success `0.8192` and substantially lower cost. |
+| Figure 3: mean inference latency | `plot_latency.pdf`, `constella_results.csv` | Maximum mean-latency reduction is about `2.68x`. |
+| Figure 4: energy consumption per orbit | `plot_energy.pdf`, `constella_results.csv` | Maximum energy reduction is about `74.01x`; the medium scenario is the documented exception where TB uses less energy. |
+| Figure 5: mean execution time per orbit | `benchmark_timing.pdf`, `benchmark_timing_summary.csv`, `benchmark_timing_raw.csv` | OCRI and LIA remain lightweight; exact wall-clock values may vary by machine. |
+| Supplemental timing detail | `benchmark_timing_per_decision.pdf` | Per-decision LIA overhead remains small; this plot is not a paper figure. |
+| Headline claims | `paper_claims_summary.csv` | Values match the expected claims encoded in `constella-evaluation/expected_results.json`. |
+| Provenance and manifest | `provenance.json`, `MANIFEST.md` | Files identify source scripts, models, and generated outputs. |
+| Validation report | `validation_report.json` | Records pass/fail status and all validation checks. |
 
-Artifact model identifiers use Python names (`squeezenet1_0`, `swin_b`,
-`efficientnet_b0`). The exported Table 1 CSV also includes the paper display
-names (`squeezenet1.0`, `swin-b`, `efficientnet-b0`).
+## Expected Headline Results
 
-## Expected Results and Validation
-
-After reproduction, inspect:
-
-```bash
-cat artifact-output/paper-results/paper_claims_summary.csv
-```
-
-Expected paper-level values are:
+The validator checks these headline values:
 
 | Claim | Expected value |
 | --- | ---: |
 | Constella minimum success rate across scenarios | `0.8192` |
-| Maximum cost reduction factor vs. baselines | about `204.82x` |
-| Maximum latency reduction factor vs. baselines | about `2.68x` |
-| Maximum energy reduction factor vs. baselines | about `74.01x` |
+| Maximum cost reduction factor vs. baselines | `204.82x` |
+| Maximum latency reduction factor vs. baselines | `2.68x` |
+| Maximum energy reduction factor vs. baselines | `74.01x` |
 
-Additional checks tied directly to the paper text:
-
-- In the small scenario, NB success is `0.1000`.
-- In the medium scenario, mean latency is approximately Constella `1541 s`, NB
-  `4129 s`, and TB `3518 s`.
-- In the large scenario, total energy is approximately Constella `43.0 Wh`, NB
-  `3183.6 Wh`, and TB `1191.0 Wh`.
-- In the extra-large scenario, OCRI selects `Y = 0`, so LIA has zero routing
-  decisions and zero measured LIA time.
+Additional deterministic checks include scenario-level cost, success, latency,
+energy, selected split layer, selected `X`/`Y`, Table 1 parameters, and model
+layer counts.
 
 Timing results are wall-clock measurements and should not be compared by exact
-equality. The paper reports OCRI runtimes of `3.93-23.35 ms`, cumulative LIA
-time of `0.04-4.19 ms` per orbit, and combined Constella overhead under `28 ms`.
-While different machines may produce slightly different values, the overall expected behavior
-is that both OCRI and LIA remain low-overhead compared to baselines.
+equality. The validator checks timing file structure, row coverage, nonnegative
+timings, and the extra-large `Y = 0` invariant that gives zero LIA routing time.
 
-## Execution Time and Resources
+## Validated Platform
 
-The full reproduction process and installation steps should complete within one
-hour on a recent workstation or cluster compute node with network access for
-Python packages. It is noteworthy that no container, VM, root privileges, or GPU access is required.
+The current Linux validation run used:
 
-Reference validation platform:
+- Operating system: Ubuntu 22.04.5 LTS (Jammy Jellyfish)
+- Architecture: `x86_64`
+- Python used to create `.constella-venv`: 3.12.13
+- `.constella-venv` Python: 3.12.13
+- Generated paper-results directory size: 324 KB
+- Validation result: `1117 passed, 0 failed`
 
-- Operating system: macOS 26.3.1
-- Python environment: conda `py312`
-- Python: 3.12.2
-- Hardware: standard CPU-only workstation
-- Observed full reproduction time: < 1min
+The exact end-to-end wall-clock time for the Linux validation run was not
+separately recorded. To record it for the final overview PDF, run:
+
+```bash
+time ./reproduce_paper_artifacts.sh
+time ./scripts/validate_results.sh
+```
 
 ## Artifact Size and Packaging
 
-The artifact is self-contained. No additional datasets are downloaded during
-execution. At the time of this check, the repository is approximately 2.1 MB and
-the generated `artifact-output/` directory is approximately 156 KB. The submission archive should include source code, scripts, `requirements.txt`,
-scenario files, model-layer reference files, and this README. Exclude local
-environments and caches such as `.venv/`, conda environments, `__pycache__/`,
-`.artifact-cache/`, and package-manager caches.
+The artifact source package should include source code, shell scripts,
+`requirements.txt`, scenario files, model-layer reference files, `README.md`,
+and `OVERVIEW.md`.
 
-## Artifact Files
+Exclude generated or local-only files and directories:
+
+- `.constella-venv/`
+- `.venv/`
+- `artifact-output/`
+- `__pycache__/`
+- `.artifact-cache/`
+- package-manager caches
+- local paper drafts such as `Constella.pdf`
+
+No additional datasets are downloaded during execution.
+
+## File Guide
 
 - `reproduce_paper_artifacts.sh`: main paper reproduction command.
 - `run_experiment.sh`: compatibility wrapper for the main command.
+- `scripts/create_env.sh`: creates `.constella-venv`.
+- `scripts/check_env.sh`: verifies dependencies and model-layer regeneration.
+- `scripts/remove_env.sh`: removes `.constella-venv`.
+- `scripts/validate_results.sh`: validates generated results.
 - `mip_solver.py`: OCRI MILP implementation.
 - `simulate.py` and `orbital_model.py`: constellation simulation and routing.
-- `constella-evaluation/generate_model_layers.py`: torchinfo-based model-layer
-  profiler.
+- `constella-evaluation/generate_model_layers.py`: torchinfo-based model-layer profiler.
 - `constella-evaluation/evaluate_constella.py`: paper evaluation metrics.
 - `constella-evaluation/benchmark_timing.py`: OCRI/LIA timing benchmark.
 - `constella-evaluation/plot_constella.py`: paper plot generation.
 - `constella-evaluation/export_artifact_bundle.py`: reviewer bundle exporter.
+- `constella-evaluation/validate_results.py`: artifact validation checks.
+- `constella-evaluation/expected_results.json`: machine-readable expected values.
 - `scenarios/*.json`: paper scenarios and simulation parameters.
 - `model-layers/*.json`: checked-in reference model-layer profiles.
