@@ -1,0 +1,329 @@
+{
+  "tolerances": {
+    "default_abs": 1e-6,
+    "rounded_abs": 0.01,
+    "rate_abs": 0.0001,
+    "timing_zero_abs": 1e-12
+  },
+  "required_files": [
+    "constella_results.csv",
+    "benchmark_timing_summary.csv",
+    "benchmark_timing_raw.csv",
+    "plot_cost_success_tradeoff.pdf",
+    "plot_latency.pdf",
+    "plot_energy.pdf",
+    "benchmark_timing.pdf",
+    "benchmark_timing_per_decision.pdf",
+    "paper_claims_summary.csv",
+    "table1_scenarios_and_parameters.csv",
+    "MANIFEST.md",
+    "provenance.json"
+  ],
+  "label_order": [
+    "extra-small",
+    "small",
+    "medium",
+    "large",
+    "extra-large"
+  ],
+  "approaches": [
+    "Constella",
+    "Naive",
+    "Traditional"
+  ],
+  "models": {
+    "extra-small": "alexnet",
+    "small": "squeezenet1_0",
+    "medium": "resnet50",
+    "large": "swin_b",
+    "extra-large": "efficientnet_b0"
+  },
+  "layer_counts": {
+    "alexnet": 23,
+    "squeezenet1_0": 67,
+    "resnet50": 182,
+    "swin_b": 311,
+    "efficientnet_b0": 329
+  },
+  "paper_claims": {
+    "Constella minimum success rate across scenarios": {
+      "value": 0.8192,
+      "tolerance": "rate_abs"
+    },
+    "Maximum cost reduction factor vs baselines": {
+      "value": 204.82,
+      "tolerance": "rounded_abs"
+    },
+    "Maximum latency reduction factor vs baselines": {
+      "value": 2.68,
+      "tolerance": "rounded_abs"
+    },
+    "Maximum energy reduction factor vs baselines": {
+      "value": 74.01,
+      "tolerance": "rounded_abs"
+    }
+  },
+  "table1": [
+    {
+      "scenario": "extra-small",
+      "paper_model_name": "alexnet",
+      "artifact_model_name": "alexnet",
+      "layer_count": 23,
+      "I_total": 100,
+      "X_total": 8,
+      "Y_total": 2
+    },
+    {
+      "scenario": "small",
+      "paper_model_name": "squeezenet1.0",
+      "artifact_model_name": "squeezenet1_0",
+      "layer_count": 67,
+      "I_total": 500,
+      "X_total": 40,
+      "Y_total": 10
+    },
+    {
+      "scenario": "medium",
+      "paper_model_name": "resnet50",
+      "artifact_model_name": "resnet50",
+      "layer_count": 182,
+      "I_total": 1000,
+      "X_total": 400,
+      "Y_total": 100
+    },
+    {
+      "scenario": "large",
+      "paper_model_name": "swin-b",
+      "artifact_model_name": "swin_b",
+      "layer_count": 311,
+      "I_total": 10000,
+      "X_total": 4000,
+      "Y_total": 1000
+    },
+    {
+      "scenario": "extra-large",
+      "paper_model_name": "efficientnet-b0",
+      "artifact_model_name": "efficientnet_b0",
+      "layer_count": 329,
+      "I_total": 100000,
+      "X_total": 8000,
+      "Y_total": 2000
+    }
+  ],
+  "shared_parameters": {
+    "R_max_bps": 625000.0,
+    "p_Wh_per_FLOP": 1.63e-13,
+    "q_Wh_per_bit": 9.89e-8,
+    "alpha": 4.0,
+    "beta": 1.0,
+    "E_processor_Wh": 1.5,
+    "E_comm_Wh": 5.0,
+    "T_comp_s": 5100.0,
+    "T_comm_s": 300.0,
+    "T_idle_s": 900.0,
+    "delta_t_s": 10.0
+  },
+  "constella_results": {
+    "extra-small|Constella": {
+      "model": "alexnet",
+      "X": 1,
+      "Y": 1,
+      "l": 1,
+      "W": 1264484352,
+      "D": 294912,
+      "cost": 5.0,
+      "success_rate": 1.0,
+      "mean_latency": 2378.83,
+      "p95_latency": 2802.83,
+      "total_energy": 2.937291
+    },
+    "extra-small|Naive": {
+      "model": "alexnet",
+      "X": 8,
+      "Y": 2,
+      "l": 12,
+      "W": 2576587392,
+      "D": 1384448,
+      "cost": 34.0,
+      "success_rate": 0.72,
+      "mean_latency": 3811.31,
+      "p95_latency": 6300.0,
+      "total_energy": 9.900376
+    },
+    "extra-small|Traditional": {
+      "model": "alexnet",
+      "X": 8,
+      "Y": 0,
+      "l": 0,
+      "W": 0,
+      "D": 602112,
+      "cost": 32.0,
+      "success_rate": 0.75,
+      "mean_latency": 4231.49,
+      "p95_latency": 6300.0,
+      "total_energy": 10.421053
+    },
+    "small|Constella": {
+      "model": "squeezenet1_0",
+      "X": 1,
+      "Y": 1,
+      "l": 63,
+      "W": 3868243840,
+      "D": 32000,
+      "cost": 5.0,
+      "success_rate": 1.0,
+      "mean_latency": 2886.38,
+      "p95_latency": 5765.92,
+      "total_energy": 1.992606
+    },
+    "small|Naive": {
+      "model": "squeezenet1_0",
+      "X": 40,
+      "Y": 10,
+      "l": 34,
+      "W": 1704546624,
+      "D": 8957952,
+      "cost": 170.0,
+      "success_rate": 0.1,
+      "mean_latency": 6021.96,
+      "p95_latency": 6300.0,
+      "total_energy": 44.435993
+    },
+    "small|Traditional": {
+      "model": "squeezenet1_0",
+      "X": 40,
+      "Y": 0,
+      "l": 0,
+      "W": 0,
+      "D": 602112,
+      "cost": 160.0,
+      "success_rate": 0.624,
+      "mean_latency": 4495.17,
+      "p95_latency": 6300.0,
+      "total_energy": 48.353688
+    },
+    "medium|Constella": {
+      "model": "resnet50",
+      "X": 3,
+      "Y": 32,
+      "l": 88,
+      "W": 24561439488,
+      "D": 1605632,
+      "cost": 44.0,
+      "success_rate": 0.869,
+      "mean_latency": 1541.35,
+      "p95_latency": 6300.0,
+      "total_energy": 141.886013
+    },
+    "medium|Naive": {
+      "model": "resnet50",
+      "X": 400,
+      "Y": 100,
+      "l": 92,
+      "W": 24664205056,
+      "D": 6422528,
+      "cost": 1700.0,
+      "success_rate": 0.7,
+      "mean_latency": 4129.75,
+      "p95_latency": 6300.0,
+      "total_energy": 448.651879
+    },
+    "medium|Traditional": {
+      "model": "resnet50",
+      "X": 400,
+      "Y": 0,
+      "l": 0,
+      "W": 0,
+      "D": 602112,
+      "cost": 1600.0,
+      "success_rate": 1.0,
+      "mean_latency": 3518.16,
+      "p95_latency": 5800.6,
+      "total_energy": 119.097754
+    },
+    "large|Constella": {
+      "model": "swin_b",
+      "X": 20,
+      "Y": 3,
+      "l": 311,
+      "W": 7652622304,
+      "D": 32000,
+      "cost": 83.0,
+      "success_rate": 0.8192,
+      "mean_latency": 3105.27,
+      "p95_latency": 6300.0,
+      "total_energy": 43.015031
+    },
+    "large|Naive": {
+      "model": "swin_b",
+      "X": 4000,
+      "Y": 1000,
+      "l": 156,
+      "W": 4716623504,
+      "D": 3211264,
+      "cost": 17000.0,
+      "success_rate": 1.0,
+      "mean_latency": 3386.56,
+      "p95_latency": 6005.61,
+      "total_energy": 3183.628192
+    },
+    "large|Traditional": {
+      "model": "swin_b",
+      "X": 4000,
+      "Y": 0,
+      "l": 0,
+      "W": 0,
+      "D": 602112,
+      "cost": 16000.0,
+      "success_rate": 1.0,
+      "mean_latency": 3517.47,
+      "p95_latency": 5798.2,
+      "total_energy": 1190.977536
+    },
+    "extra-large|Constella": {
+      "model": "efficientnet_b0",
+      "X": 197,
+      "Y": 0,
+      "l": 74,
+      "W": 10452949924,
+      "D": 4608,
+      "cost": 788.0,
+      "success_rate": 1.0,
+      "mean_latency": 3451.55,
+      "p95_latency": 5745.8,
+      "total_energy": 212.720106
+    },
+    "extra-large|Naive": {
+      "model": "efficientnet_b0",
+      "X": 8000,
+      "Y": 2000,
+      "l": 165,
+      "W": 11085261704,
+      "D": 3010560,
+      "cost": 34000.0,
+      "success_rate": 0.32,
+      "mean_latency": 5305.64,
+      "p95_latency": 6300.0,
+      "total_energy": 9708.510054
+    },
+    "extra-large|Traditional": {
+      "model": "efficientnet_b0",
+      "X": 8000,
+      "Y": 0,
+      "l": 0,
+      "W": 0,
+      "D": 602112,
+      "cost": 32000.0,
+      "success_rate": 0.6269,
+      "mean_latency": 4494.15,
+      "p95_latency": 6300.0,
+      "total_energy": 9688.066315
+    }
+  },
+  "timing": {
+    "iterations": 50,
+    "zero_lia_labels": [
+      "extra-large"
+    ]
+  }
+}

@@ -141,6 +141,7 @@ celerybeat.pid
 .env
 .envrc
 .venv
+.constella-venv
 env/
 venv/
 ENV/
@@ -201,6 +202,7 @@ constella-evaluation/results/
 
 # Local paper drafts and agent/editor state
 /Constella.pdf
+ARTIFACT_GUIDELINES_ASSESSMENT.md
 .claude/
 
 # PyPI configuration file
