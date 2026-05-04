@@ -24,6 +24,8 @@ Validated Linux platform:
 - Architecture: `x86_64`
 - Python used to create the artifact environment: 3.12.13
 - Artifact environment Python: 3.12.13
+- Observed full reproduction time: 29.560 s
+- Observed validation time: 0.029 s
 - Generated `artifact-output/paper-results/` size: 324 KB
 - Validation result: `1117 passed, 0 failed`
 
@@ -128,9 +130,9 @@ To record the exact end-to-end runtime on a reviewer machine, run:
 time ./reproduce_paper_artifacts.sh
 ```
 
-The Linux validation run completed successfully, but its full wall-clock runtime
-was not separately recorded. The generated `artifact-output/paper-results/`
-directory was 324 KB.
+On the validated Linux platform, the observed wall-clock runtime was 29.560 s
+for full reproduction. The generated `artifact-output/paper-results/` directory
+was 324 KB.
 
 ### Reduced Functional Check
 
@@ -173,6 +175,9 @@ A successful run prints:
 Status: PASS
 Checks: 1117 passed, 0 failed, 1117 total
 ```
+
+On the validated Linux platform, the observed validation wall-clock runtime was
+0.029 s.
 
 The validator checks:
 

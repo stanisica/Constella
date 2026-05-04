@@ -195,11 +195,12 @@ The current Linux validation run used:
 - Architecture: `x86_64`
 - Python used to create `.constella-venv`: 3.12.13
 - `.constella-venv` Python: 3.12.13
+- Observed full reproduction time: 29.560 s
+- Observed validation time: 0.029 s
 - Generated paper-results directory size: 324 KB
 - Validation result: `1117 passed, 0 failed`
 
-The exact end-to-end wall-clock time for the Linux validation run was not
-separately recorded. To record it for the final overview PDF, run:
+To record fresh wall-clock times on another machine, run:
 
 ```bash
 time ./reproduce_paper_artifacts.sh

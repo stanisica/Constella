@@ -200,9 +200,7 @@ cython_debug/
 artifact-output/
 constella-evaluation/results/
 
-# Local paper drafts and agent/editor state
-/Constella.pdf
-ARTIFACT_GUIDELINES_ASSESSMENT.md
+# Agent/editor state
 .claude/
 
 # PyPI configuration file
