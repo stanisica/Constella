@@ -9,6 +9,31 @@ The artifact reproduces selected empirical results from the paper: Table 1,
 Figures 2-5, and the headline claims on success rate, deployment cost, latency,
 energy consumption, and OCRI/LIA execution overhead.
 
+## Archive Distribution
+
+The artifact package is provided through an external URL, in line with the
+Euro-Par 2026 artifact submission guidelines.
+
+- Archive filename: `constella-ddc2b3b.tar.gz`
+- URL:
+
+```text
+https://drive.google.com/file/d/1Hi8qXljGv5wmgJzZUStxXKsOJGkCcm2f/view
+```
+- Archive size: 31,521 bytes (31 KB)
+- SHA-256: `9f4ce6ceaad12f30c4331c5a23bd122623292d9c052c44241868f796260bfd0b`
+
+After downloading, reviewers can verify integrity with:
+
+```bash
+shasum -a 256 constella-ddc2b3b.tar.gz
+```
+
+The expected SHA-256 above must match the value printed by the command. The
+archive extracts into a single top-level directory `constella-artifact/`
+containing all source code, scenarios, model-layer profiles, scripts, and
+documentation.
+
 ## 1. Getting Started Guide
 
 ### Supported Platform
